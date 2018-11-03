@@ -172,7 +172,7 @@ public class TriggerCallbackThread {
     private void callbackLog(List<HandleCallbackParam> callbackParamList, String logContent){
         for (HandleCallbackParam callbackParam: callbackParamList) {
             String logFileName = XxlJobFileAppender.makeLogFileName(new Date(callbackParam.getLogDateTim()), callbackParam.getLogId());
-            XxlJobFileAppender.contextHolder.set(logFileName);
+            XxlJobFileAppender.CONTEXT_HOLDER.set(logFileName);
             XxlJobLogger.log(logContent);
         }
     }
@@ -180,7 +180,7 @@ public class TriggerCallbackThread {
 
     // ---------------------- fail-callback file ----------------------
 
-    private static String failCallbackFileName = XxlJobFileAppender.getLogPath().concat(File.separator).concat("xxl-job-callback").concat(".log");
+    private static String failCallbackFileName = XxlJobFileAppender.getLogBasePath().concat(File.separator).concat("xxl-job-callback").concat(".log");
 
     private void appendFailCallbackFile(List<HandleCallbackParam> callbackParamList){
         // append file

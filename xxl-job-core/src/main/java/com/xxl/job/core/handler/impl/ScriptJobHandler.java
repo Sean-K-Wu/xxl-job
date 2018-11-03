@@ -68,7 +68,7 @@ public class ScriptJobHandler extends IJobHandler {
         }
 
         // log file
-        String logFileName = XxlJobFileAppender.contextHolder.get();
+        String logFileName = XxlJobFileAppender.CONTEXT_HOLDER.get();
 
         // script params：0=param、1=分片序号、2=分片总数
         ShardingUtil.ShardingVO shardingVO = ShardingUtil.getShardingVo();
