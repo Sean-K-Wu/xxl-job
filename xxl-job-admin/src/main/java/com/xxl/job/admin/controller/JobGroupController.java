@@ -3,7 +3,6 @@ package com.xxl.job.admin.controller;
 import com.xxl.job.admin.core.conf.XxlJobAdminConfig;
 import com.xxl.job.admin.core.model.XxlJobGroup;
 import com.xxl.job.admin.core.model.XxlJobRegistry;
-import com.xxl.job.admin.core.schedule.XxlJobDynamicScheduler;
 import com.xxl.job.admin.core.util.I18nUtil;
 import com.xxl.job.admin.dao.XxlJobGroupDao;
 import com.xxl.job.admin.dao.XxlJobInfoDao;
@@ -119,7 +118,7 @@ public class JobGroupController {
 		List<XxlJobRegistry> list = XxlJobAdminConfig.getAdminConfig().getXxlJobRegistryDao().findAll(RegistryConfig.DEAD_TIMEOUT);
 		if (list != null) {
 			for (XxlJobRegistry item: list) {
-				if (RegistryConfig.RegistType.EXECUTOR.name().equals(item.getRegistryGroup())) {
+				if (RegistryConfig.RegistrationTypeEnum.EXECUTOR.name().equals(item.getRegistryGroup())) {
 					String appName = item.getRegistryKey();
 					List<String> registryList = appAddressMap.get(appName);
 					if (registryList == null) {
