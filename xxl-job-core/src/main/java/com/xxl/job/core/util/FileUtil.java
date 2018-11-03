@@ -1,10 +1,10 @@
 package com.xxl.job.core.util;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,32 +12,24 @@ import java.util.List;
  *
  * @author xuxueli 2017-12-29 17:56:48
  */
+@Slf4j
 public class FileUtil {
-    private static Logger logger = LoggerFactory.getLogger(FileUtil.class);
 
-    /**
-     * delete recursively
-     *
-     * @param root
-     * @return
-     */
-    public static boolean deleteRecursively(File root) {
-        if (root != null && root.exists()) {
+    public static void deleteRecursively(File root) {
+        if (null != root && root.exists()) {
             if (root.isDirectory()) {
                 File[] children = root.listFiles();
-                if (children != null) {
+                if (null != children) {
                     for (File child : children) {
                         deleteRecursively(child);
                     }
                 }
             }
-            return root.delete();
+            root.delete();
         }
-        return false;
     }
 
     public static void deleteFile(String fileName) {
-        // file
         File file = new File(fileName);
         if (file.exists()) {
             file.delete();
@@ -45,80 +37,77 @@ public class FileUtil {
     }
 
     public static void appendFileLine(String fileName, String content) {
-
-        // file
         File file = new File(fileName);
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                logger.error(e.getMessage(), e);
-                return;
-            }
+        if (createFileIfNotExist(file)) {
+            return;
         }
 
-        // content
-        if (content == null) {
-            content = "";
-        }
+        content = Strings.nullToEmpty(content);
         content += "\r\n";
 
-        // append file content
+        appendContentToFile(content, file);
+    }
+
+    public static void appendContentToFile(String content, File file) {
         FileOutputStream fos = null;
         try {
             fos = new FileOutputStream(file, true);
             fos.write(content.getBytes("utf-8"));
             fos.flush();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         } finally {
             if (fos != null) {
                 try {
                     fos.close();
                 } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         }
-
     }
 
-    public static List<String> loadFileLines(String fileName){
+    public static boolean createFileIfNotExist(File file) {
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                log.error(e.getMessage(), e);
+                return true;
+            }
+        }
+        return false;
+    }
 
-        List<String> result = new ArrayList<>();
+    public static List<String> loadFileLines(String fileName) {
+        List<String> result = Lists.newArrayList();
 
-        // valid log file
         File file = new File(fileName);
         if (!file.exists()) {
             return result;
         }
 
-        // read file
-        StringBuffer logContentBuffer = new StringBuffer();
-        int toLineNum = 0;
         LineNumberReader reader = null;
         try {
-            //reader = new LineNumberReader(new FileReader(logFile));
             reader = new LineNumberReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
-            String line = null;
-            while ((line = reader.readLine())!=null) {
-                if (line!=null && line.trim().length()>0) {
+            String line;
+            while (null != (line = reader.readLine())) {
+                if (line.trim().length() > 0) {
                     result.add(line);
                 }
             }
         } catch (IOException e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         } finally {
-            if (reader != null) {
+            if (null != reader) {
                 try {
                     reader.close();
                 } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
                 }
             }
         }
 
         return result;
     }
-
 }

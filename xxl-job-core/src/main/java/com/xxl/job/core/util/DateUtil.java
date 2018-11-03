@@ -10,12 +10,12 @@ import java.util.Date;
  * @author xuxueli 2018-08-19 01:24:11
  */
 public class DateUtil {
+
     private static final String DATE_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     private static ThreadLocal<SimpleDateFormat> threadLocal = new ThreadLocal<SimpleDateFormat>() {
         @Override
         protected synchronized SimpleDateFormat initialValue() {
-            //return super.initialValue();
             return new SimpleDateFormat(DATE_FORMAT);
         }
     };
