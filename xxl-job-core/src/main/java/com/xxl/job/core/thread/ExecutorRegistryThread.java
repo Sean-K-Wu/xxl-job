@@ -92,6 +92,10 @@ public class ExecutorRegistryThread extends Thread {
 
     public void toStop() {
         toStop = true;
+        if (null == registryThread) {
+            return;
+        }
+
         // interrupt and wait
         registryThread.interrupt();
         try {
