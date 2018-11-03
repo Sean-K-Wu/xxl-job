@@ -10,40 +10,43 @@ import com.xxl.job.core.biz.model.TriggerParam;
 public interface ExecutorBiz {
 
     /**
-     * beat
+     * 心跳
+     *
      * @return
      */
-    public ReturnT<String> beat();
+    ReturnT<String> beat();
 
     /**
-     * idle beat
+     * 闲时心跳
      *
      * @param jobId
      * @return
      */
-    public ReturnT<String> idleBeat(int jobId);
+    ReturnT<String> idleBeat(int jobId);
 
     /**
-     * kill
+     * 停止任务
+     *
      * @param jobId
      * @return
      */
-    public ReturnT<String> kill(int jobId);
+    ReturnT<String> kill(int jobId);
 
     /**
-     * log
-     * @param logDateTim
+     * 记录日志
+     *
+     * @param logDateTime
      * @param logId
      * @param fromLineNum
      * @return
      */
-    public ReturnT<LogResult> log(long logDateTim, int logId, int fromLineNum);
+    ReturnT<LogResult> log(long logDateTime, int logId, int fromLineNum);
 
     /**
-     * run
+     * 运行
+     *
      * @param triggerParam
      * @return
      */
-    public ReturnT<String> run(TriggerParam triggerParam);
-
+    ReturnT<String> run(TriggerParam triggerParam);
 }

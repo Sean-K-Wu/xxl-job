@@ -9,7 +9,7 @@ import com.xxl.job.admin.dao.XxlJobInfoDao;
 import com.xxl.job.admin.dao.XxlJobLogDao;
 import com.xxl.job.admin.dao.XxlJobRegistryDao;
 import com.xxl.job.core.biz.AdminBiz;
-import com.xxl.job.core.biz.model.HandleCallbackParam;
+import com.xxl.job.core.biz.model.CallbackParam;
 import com.xxl.job.core.biz.model.RegistryParam;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
@@ -39,19 +39,19 @@ public class AdminBizImpl implements AdminBiz {
 
 
     @Override
-    public ReturnT<String> callback(List<HandleCallbackParam> callbackParamList) {
-        for (HandleCallbackParam handleCallbackParam: callbackParamList) {
-            ReturnT<String> callbackResult = callback(handleCallbackParam);
-            logger.info(">>>>>>>>> JobApiController.callback {}, handleCallbackParam={}, callbackResult={}",
-                    (callbackResult.getCode()==IJobHandler.SUCCESS.getCode()?"success":"fail"), handleCallbackParam, callbackResult);
+    public ReturnT<String> callback(List<CallbackParam> callbackParamList) {
+        for (CallbackParam callbackParam : callbackParamList) {
+            ReturnT<String> callbackResult = callback(callbackParam);
+            logger.info(">>>>>>>>> JobApiController.callback {}, callbackParam={}, callbackResult={}",
+                    (callbackResult.getCode()==IJobHandler.SUCCESS.getCode()?"success":"fail"), callbackParam, callbackResult);
         }
 
         return ReturnT.SUCCESS;
     }
 
-    private ReturnT<String> callback(HandleCallbackParam handleCallbackParam) {
+    private ReturnT<String> callback(CallbackParam callbackParam) {
         // valid log item
-        XxlJobLog log = xxlJobLogDao.load(handleCallbackParam.getLogId());
+        XxlJobLog log = xxlJobLogDao.load(callbackParam.getLogId());
         if (log == null) {
             return new ReturnT<String>(ReturnT.FAIL_CODE, "log item not found.");
         }
@@ -61,7 +61,7 @@ public class AdminBizImpl implements AdminBiz {
 
         // trigger success, to trigger child job
         String callbackMsg = null;
-        if (IJobHandler.SUCCESS.getCode() == handleCallbackParam.getExecuteResult().getCode()) {
+        if (IJobHandler.SUCCESS.getCode() == callbackParam.getExecuteResult().getCode()) {
             XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadById(log.getJobId());
             if (xxlJobInfo!=null && StringUtils.isNotBlank(xxlJobInfo.getChildJobId())) {
                 callbackMsg = "<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>"+ I18nUtil.getString("jobconf_trigger_child_run") +"<<<<<<<<<<< </span><br>";
@@ -97,8 +97,8 @@ public class AdminBizImpl implements AdminBiz {
         if (log.getHandleMsg()!=null) {
             handleMsg.append(log.getHandleMsg()).append("<br>");
         }
-        if (handleCallbackParam.getExecuteResult().getMsg() != null) {
-            handleMsg.append(handleCallbackParam.getExecuteResult().getMsg());
+        if (callbackParam.getExecuteResult().getMsg() != null) {
+            handleMsg.append(callbackParam.getExecuteResult().getMsg());
         }
         if (callbackMsg != null) {
             handleMsg.append(callbackMsg);
@@ -106,7 +106,7 @@ public class AdminBizImpl implements AdminBiz {
 
         // success, save log
         log.setHandleTime(new Date());
-        log.setHandleCode(handleCallbackParam.getExecuteResult().getCode());
+        log.setHandleCode(callbackParam.getExecuteResult().getCode());
         log.setHandleMsg(handleMsg.toString());
         xxlJobLogDao.updateHandleInfo(log);
 
@@ -115,16 +115,16 @@ public class AdminBizImpl implements AdminBiz {
 
     @Override
     public ReturnT<String> registry(RegistryParam registryParam) {
-        int ret = xxlJobRegistryDao.registryUpdate(registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
+        int ret = xxlJobRegistryDao.registryUpdate(registryParam.getRegistryGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
         if (ret < 1) {
-            xxlJobRegistryDao.registrySave(registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
+            xxlJobRegistryDao.registrySave(registryParam.getRegistryGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
         }
         return ReturnT.SUCCESS;
     }
 
     @Override
     public ReturnT<String> registryRemove(RegistryParam registryParam) {
-        xxlJobRegistryDao.registryDelete(registryParam.getRegistGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
+        xxlJobRegistryDao.registryDelete(registryParam.getRegistryGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
         return ReturnT.SUCCESS;
     }
 

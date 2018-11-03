@@ -7,15 +7,15 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * Created by xuxueli on 2017-05-10 20:22:42
+ * Created by xuxueli on 17/3/2.
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegistryParam implements Serializable {
+public class CallbackParam implements Serializable {
     private static final long serialVersionUID = 42L;
 
-    private String registryGroup;
-    private String registryKey;
-    private String registryValue;
+    private int logId;
+    private long logDateTime;
+    private ReturnT<String> executeResult;
 }

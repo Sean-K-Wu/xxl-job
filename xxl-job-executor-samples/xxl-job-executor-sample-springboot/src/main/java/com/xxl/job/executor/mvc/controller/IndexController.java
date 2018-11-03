@@ -12,7 +12,6 @@ public class IndexController {
     @RequestMapping("/")
     @ResponseBody
     String index() {
-        return "xxl job executor running.";
+        return "spring boot xxl job executor running.";
     }
-
 }

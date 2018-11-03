@@ -1,6 +1,6 @@
 package com.xxl.job.core.biz;
 
-import com.xxl.job.core.biz.model.HandleCallbackParam;
+import com.xxl.job.core.biz.model.CallbackParam;
 import com.xxl.job.core.biz.model.RegistryParam;
 import com.xxl.job.core.biz.model.ReturnT;
 
@@ -11,36 +11,29 @@ import java.util.List;
  */
 public interface AdminBiz {
 
-    public static final String MAPPING = "/api";
-
-
-    // ---------------------- callback ----------------------
+    String MAPPING = "/api";
 
     /**
-     * callback
+     * 回调
      *
      * @param callbackParamList
      * @return
      */
-    public ReturnT<String> callback(List<HandleCallbackParam> callbackParamList);
-
-
-    // ---------------------- registry ----------------------
+    ReturnT<String> callback(List<CallbackParam> callbackParamList);
 
     /**
-     * registry
+     * 注册
      *
      * @param registryParam
      * @return
      */
-    public ReturnT<String> registry(RegistryParam registryParam);
+    ReturnT<String> registry(RegistryParam registryParam);
 
     /**
-     * registry remove
+     * 注册移除
      *
      * @param registryParam
      * @return
      */
-    public ReturnT<String> registryRemove(RegistryParam registryParam);
-
+    ReturnT<String> registryRemove(RegistryParam registryParam);
 }
