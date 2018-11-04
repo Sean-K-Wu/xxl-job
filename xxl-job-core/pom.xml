@@ -64,6 +64,13 @@
             <version>${guava.version}</version>
         </dependency>
 
+        <!-- inject -->
+        <dependency>
+            <groupId>javax.inject</groupId>
+            <artifactId>javax.inject</artifactId>
+            <version>${inject.version}</version>
+        </dependency>
+
     </dependencies>
 
 </project>

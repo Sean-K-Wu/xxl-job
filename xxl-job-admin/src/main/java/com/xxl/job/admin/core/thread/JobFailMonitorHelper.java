@@ -4,10 +4,8 @@ import com.xxl.job.admin.core.conf.XxlJobAdminConfig;
 import com.xxl.job.admin.core.model.XxlJobGroup;
 import com.xxl.job.admin.core.model.XxlJobInfo;
 import com.xxl.job.admin.core.model.XxlJobLog;
-import com.xxl.job.admin.core.schedule.XxlJobDynamicScheduler;
 import com.xxl.job.admin.core.trigger.TriggerTypeEnum;
 import com.xxl.job.admin.core.util.I18nUtil;
-import com.xxl.job.admin.core.util.MailUtil;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
 import org.apache.commons.collections4.CollectionUtils;
@@ -190,7 +188,7 @@ public class JobFailMonitorHelper {
 						info.getJobDesc(),
 						alarmContent);
 
-				MailUtil.sendMail(email, title, content);
+				//MailUtil.sendMail(email, title, content);
 			}
 		}
 
