@@ -13,9 +13,8 @@ import com.xxl.job.core.biz.model.CallbackParam;
 import com.xxl.job.core.biz.model.RegistryParam;
 import com.xxl.job.core.biz.model.ReturnT;
 import com.xxl.job.core.handler.IJobHandler;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -26,10 +25,9 @@ import java.util.List;
 /**
  * @author xuxueli 2017-07-27 21:54:20
  */
+@Slf4j
 @Service
 public class AdminBizImpl implements AdminBiz {
-    private static Logger logger = LoggerFactory.getLogger(AdminBizImpl.class);
-
     @Resource
     public XxlJobLogDao xxlJobLogDao;
     @Resource
@@ -37,13 +35,12 @@ public class AdminBizImpl implements AdminBiz {
     @Resource
     private XxlJobRegistryDao xxlJobRegistryDao;
 
-
     @Override
     public ReturnT<String> callback(List<CallbackParam> callbackParamList) {
         for (CallbackParam callbackParam : callbackParamList) {
             ReturnT<String> callbackResult = callback(callbackParam);
-            logger.info(">>>>>>>>> JobApiController.callback {}, callbackParam={}, callbackResult={}",
-                    (callbackResult.getCode()==IJobHandler.SUCCESS.getCode()?"success":"fail"), callbackParam, callbackResult);
+            log.info(">>>>>>>>> JobApiController.callback {}, callbackParam={}, callbackResult={}",
+                    (callbackResult.getCode() == IJobHandler.SUCCESS.getCode() ? "success" : "fail"), callbackParam, callbackResult);
         }
 
         return ReturnT.SUCCESS;
@@ -63,12 +60,12 @@ public class AdminBizImpl implements AdminBiz {
         String callbackMsg = null;
         if (IJobHandler.SUCCESS.getCode() == callbackParam.getExecuteResult().getCode()) {
             XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadById(log.getJobId());
-            if (xxlJobInfo!=null && StringUtils.isNotBlank(xxlJobInfo.getChildJobId())) {
-                callbackMsg = "<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>"+ I18nUtil.getString("jobconf_trigger_child_run") +"<<<<<<<<<<< </span><br>";
+            if (xxlJobInfo != null && StringUtils.isNotBlank(xxlJobInfo.getChildJobId())) {
+                callbackMsg = "<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_child_run") + "<<<<<<<<<<< </span><br>";
 
                 String[] childJobIds = xxlJobInfo.getChildJobId().split(",");
                 for (int i = 0; i < childJobIds.length; i++) {
-                    int childJobId = (StringUtils.isNotBlank(childJobIds[i]) && StringUtils.isNumeric(childJobIds[i]))?Integer.valueOf(childJobIds[i]):-1;
+                    int childJobId = (StringUtils.isNotBlank(childJobIds[i]) && StringUtils.isNumeric(childJobIds[i])) ? Integer.valueOf(childJobIds[i]) : -1;
                     if (childJobId > 0) {
 
                         JobTriggerPoolHelper.trigger(childJobId, TriggerTypeEnum.PARENT, 0, null, null);
@@ -76,14 +73,14 @@ public class AdminBizImpl implements AdminBiz {
 
                         // add msg
                         callbackMsg += MessageFormat.format(I18nUtil.getString("jobconf_callback_child_msg1"),
-                                (i+1),
+                                (i + 1),
                                 childJobIds.length,
                                 childJobIds[i],
-                                (triggerChildResult.getCode()==ReturnT.SUCCESS_CODE?I18nUtil.getString("system_success"):I18nUtil.getString("system_fail")),
+                                (triggerChildResult.getCode() == ReturnT.SUCCESS_CODE ? I18nUtil.getString("system_success") : I18nUtil.getString("system_fail")),
                                 triggerChildResult.getMsg());
                     } else {
                         callbackMsg += MessageFormat.format(I18nUtil.getString("jobconf_callback_child_msg2"),
-                                (i+1),
+                                (i + 1),
                                 childJobIds.length,
                                 childJobIds[i]);
                     }
@@ -94,7 +91,7 @@ public class AdminBizImpl implements AdminBiz {
 
         // handle msg
         StringBuffer handleMsg = new StringBuffer();
-        if (log.getHandleMsg()!=null) {
+        if (log.getHandleMsg() != null) {
             handleMsg.append(log.getHandleMsg()).append("<br>");
         }
         if (callbackParam.getExecuteResult().getMsg() != null) {
@@ -115,17 +112,26 @@ public class AdminBizImpl implements AdminBiz {
 
     @Override
     public ReturnT<String> registry(RegistryParam registryParam) {
-        int ret = xxlJobRegistryDao.registryUpdate(registryParam.getRegistryGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
-        if (ret < 1) {
-            xxlJobRegistryDao.registrySave(registryParam.getRegistryGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
+        String registryGroup = registryParam.getRegistryGroup();
+        String registryKey = registryParam.getRegistryKey();
+        String registryValue = registryParam.getRegistryValue();
+        int updateRecords = xxlJobRegistryDao.registryUpdate(registryGroup, registryKey, registryValue);
+        log.info(">>>>>>>>>>> registry, registryGroup={}, registryKey={}, registryValue={}, updateRecords={}",
+                registryGroup, registryKey, registryValue, updateRecords);
+        if (updateRecords < 1) {
+            xxlJobRegistryDao.registrySave(registryGroup, registryKey, registryValue);
         }
         return ReturnT.SUCCESS;
     }
 
     @Override
     public ReturnT<String> registryRemove(RegistryParam registryParam) {
-        xxlJobRegistryDao.registryDelete(registryParam.getRegistryGroup(), registryParam.getRegistryKey(), registryParam.getRegistryValue());
+        String registryGroup = registryParam.getRegistryGroup();
+        String registryKey = registryParam.getRegistryKey();
+        String registryValue = registryParam.getRegistryValue();
+        xxlJobRegistryDao.registryDelete(registryGroup, registryKey, registryValue);
+        log.info(">>>>>>>>>>> registryRemove, registryGroup={}, registryKey={}, registryValue={}",
+                registryGroup, registryKey, registryValue);
         return ReturnT.SUCCESS;
     }
-
 }
