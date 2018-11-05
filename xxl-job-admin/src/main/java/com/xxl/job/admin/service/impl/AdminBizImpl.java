@@ -28,6 +28,7 @@ import java.util.List;
 @Slf4j
 @Service
 public class AdminBizImpl implements AdminBiz {
+
     @Resource
     public XxlJobLogDao xxlJobLogDao;
     @Resource
@@ -37,11 +38,11 @@ public class AdminBizImpl implements AdminBiz {
 
     @Override
     public ReturnT<String> callback(List<CallbackParam> callbackParamList) {
-        for (CallbackParam callbackParam : callbackParamList) {
+        callbackParamList.forEach(callbackParam -> {
             ReturnT<String> callbackResult = callback(callbackParam);
             log.info(">>>>>>>>> JobApiController.callback {}, callbackParam={}, callbackResult={}",
                     (callbackResult.getCode() == IJobHandler.SUCCESS.getCode() ? "success" : "fail"), callbackParam, callbackResult);
-        }
+        });
 
         return ReturnT.SUCCESS;
     }
@@ -49,62 +50,64 @@ public class AdminBizImpl implements AdminBiz {
     private ReturnT<String> callback(CallbackParam callbackParam) {
         // valid log item
         XxlJobLog log = xxlJobLogDao.load(callbackParam.getLogId());
-        if (log == null) {
-            return new ReturnT<String>(ReturnT.FAIL_CODE, "log item not found.");
+        if (null == log) {
+            return new ReturnT<>(ReturnT.FAIL_CODE, "log item not found.");
         }
         if (log.getHandleCode() > 0) {
-            return new ReturnT<String>(ReturnT.FAIL_CODE, "log repeate callback.");     // avoid repeat callback, trigger child job etc
+            // avoid repeat callback, trigger child job etc
+            return new ReturnT<>(ReturnT.FAIL_CODE, "log repeat callback.");
         }
 
-        // trigger success, to trigger child job
-        String callbackMsg = null;
+        StringBuilder callbackMsg = null;
         if (IJobHandler.SUCCESS.getCode() == callbackParam.getExecuteResult().getCode()) {
+            // trigger success, to trigger child job
             XxlJobInfo xxlJobInfo = xxlJobInfoDao.loadById(log.getJobId());
-            if (xxlJobInfo != null && StringUtils.isNotBlank(xxlJobInfo.getChildJobId())) {
-                callbackMsg = "<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>" + I18nUtil.getString("jobconf_trigger_child_run") + "<<<<<<<<<<< </span><br>";
+            if (null != xxlJobInfo && StringUtils.isNotBlank(xxlJobInfo.getChildJobId())) {
+                callbackMsg = new StringBuilder("<br><br><span style=\"color:#00c0ef;\" > >>>>>>>>>>>" +
+                        I18nUtil.getString("jobconf_trigger_child_run") + "<<<<<<<<<<< </span><br>");
 
                 String[] childJobIds = xxlJobInfo.getChildJobId().split(",");
                 for (int i = 0; i < childJobIds.length; i++) {
-                    int childJobId = (StringUtils.isNotBlank(childJobIds[i]) && StringUtils.isNumeric(childJobIds[i])) ? Integer.valueOf(childJobIds[i]) : -1;
-                    if (childJobId > 0) {
+                    int childJobId = (StringUtils.isNotBlank(childJobIds[i]) && StringUtils.isNumeric(childJobIds[i])) ?
+                            Integer.valueOf(childJobIds[i]) : -1;
 
+                    if (childJobId > 0) {
                         JobTriggerPoolHelper.trigger(childJobId, TriggerTypeEnum.PARENT, 0, null, null);
                         ReturnT<String> triggerChildResult = ReturnT.SUCCESS;
 
                         // add msg
-                        callbackMsg += MessageFormat.format(I18nUtil.getString("jobconf_callback_child_msg1"),
+                        callbackMsg.append(MessageFormat.format(I18nUtil.getString("jobconf_callback_child_msg1"),
                                 (i + 1),
                                 childJobIds.length,
                                 childJobIds[i],
                                 (triggerChildResult.getCode() == ReturnT.SUCCESS_CODE ? I18nUtil.getString("system_success") : I18nUtil.getString("system_fail")),
-                                triggerChildResult.getMsg());
+                                triggerChildResult.getMsg()));
                     } else {
-                        callbackMsg += MessageFormat.format(I18nUtil.getString("jobconf_callback_child_msg2"),
+                        callbackMsg.append(MessageFormat.format(I18nUtil.getString("jobconf_callback_child_msg2"),
                                 (i + 1),
                                 childJobIds.length,
-                                childJobIds[i]);
+                                childJobIds[i]));
                     }
                 }
-
             }
         }
 
         // handle msg
-        StringBuffer handleMsg = new StringBuffer();
-        if (log.getHandleMsg() != null) {
-            handleMsg.append(log.getHandleMsg()).append("<br>");
+        StringBuilder sb = new StringBuilder();
+        if (null != log.getHandleMsg()) {
+            sb.append(log.getHandleMsg()).append("<br>");
         }
-        if (callbackParam.getExecuteResult().getMsg() != null) {
-            handleMsg.append(callbackParam.getExecuteResult().getMsg());
+        if (null != callbackParam.getExecuteResult().getMsg()) {
+            sb.append(callbackParam.getExecuteResult().getMsg());
         }
-        if (callbackMsg != null) {
-            handleMsg.append(callbackMsg);
+        if (null != callbackMsg) {
+            sb.append(callbackMsg);
         }
 
         // success, save log
         log.setHandleTime(new Date());
         log.setHandleCode(callbackParam.getExecuteResult().getCode());
-        log.setHandleMsg(handleMsg.toString());
+        log.setHandleMsg(sb.toString());
         xxlJobLogDao.updateHandleInfo(log);
 
         return ReturnT.SUCCESS;
@@ -116,7 +119,7 @@ public class AdminBizImpl implements AdminBiz {
         String registryKey = registryParam.getRegistryKey();
         String registryValue = registryParam.getRegistryValue();
         int updateRecords = xxlJobRegistryDao.registryUpdate(registryGroup, registryKey, registryValue);
-        log.info(">>>>>>>>>>> registry, registryGroup={}, registryKey={}, registryValue={}, updateRecords={}",
+        log.info(">>>>>>>>> registry, registryGroup={}, registryKey={}, registryValue={}, updateRecords={}",
                 registryGroup, registryKey, registryValue, updateRecords);
         if (updateRecords < 1) {
             xxlJobRegistryDao.registrySave(registryGroup, registryKey, registryValue);
@@ -130,7 +133,7 @@ public class AdminBizImpl implements AdminBiz {
         String registryKey = registryParam.getRegistryKey();
         String registryValue = registryParam.getRegistryValue();
         xxlJobRegistryDao.registryDelete(registryGroup, registryKey, registryValue);
-        log.info(">>>>>>>>>>> registryRemove, registryGroup={}, registryKey={}, registryValue={}",
+        log.info(">>>>>>>>> registryRemove, registryGroup={}, registryKey={}, registryValue={}",
                 registryGroup, registryKey, registryValue);
         return ReturnT.SUCCESS;
     }

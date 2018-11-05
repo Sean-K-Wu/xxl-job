@@ -9,32 +9,33 @@ import java.util.List;
 
 /**
  * job info
+ *
  * @author xuxueli 2016-1-12 18:03:45
  */
 @Mapper
 public interface XxlJobInfoDao {
 
-	public List<XxlJobInfo> pageList(@Param("offset") int offset,
-									 @Param("pagesize") int pagesize,
-									 @Param("jobGroup") int jobGroup,
-									 @Param("jobDesc") String jobDesc,
-									 @Param("executorHandler") String executorHandler);
-	public int pageListCount(@Param("offset") int offset,
-							 @Param("pagesize") int pagesize,
-							 @Param("jobGroup") int jobGroup,
-							 @Param("jobDesc") String jobDesc,
-							 @Param("executorHandler") String executorHandler);
-	
-	public int save(XxlJobInfo info);
+    List<XxlJobInfo> pageList(@Param("offset") int offset,
+                              @Param("pagesize") int pagesize,
+                              @Param("jobGroup") int jobGroup,
+                              @Param("jobDesc") String jobDesc,
+                              @Param("executorHandler") String executorHandler);
 
-	public XxlJobInfo loadById(@Param("id") int id);
-	
-	public int update(XxlJobInfo item);
-	
-	public int delete(@Param("id") int id);
+    int pageListCount(@Param("offset") int offset,
+                      @Param("pagesize") int pagesize,
+                      @Param("jobGroup") int jobGroup,
+                      @Param("jobDesc") String jobDesc,
+                      @Param("executorHandler") String executorHandler);
 
-	public List<XxlJobInfo> getJobsByGroup(@Param("jobGroup") int jobGroup);
+    int save(XxlJobInfo info);
 
-	public int findAllCount();
+    XxlJobInfo loadById(@Param("id") int id);
 
+    int update(XxlJobInfo item);
+
+    int delete(@Param("id") int id);
+
+    List<XxlJobInfo> getJobsByGroup(@Param("jobGroup") int jobGroup);
+
+    int findAllCount();
 }
