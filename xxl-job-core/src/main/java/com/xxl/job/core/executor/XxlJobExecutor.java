@@ -19,8 +19,10 @@ import com.xxl.rpc.remoting.provider.XxlRpcProviderFactory;
 import com.xxl.rpc.serialize.Serializer;
 import com.xxl.rpc.util.IpUtil;
 import com.xxl.rpc.util.NetUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -33,11 +35,12 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * Created by xuxueli on 2016/3/2 21:14.
  */
+@Data
+@Slf4j
 public class XxlJobExecutor implements ApplicationContextAware {
-    private static final Logger logger = LoggerFactory.getLogger(XxlJobExecutor.class);
-
-    // ---------------------- param ----------------------
     private String adminAddresses;
+    @Getter
+    @Setter
     private static String appName;
     private String ip;
     private int port;
@@ -45,36 +48,12 @@ public class XxlJobExecutor implements ApplicationContextAware {
     private String logPath;
     private int logRetentionDays;
 
-    public void setAdminAddresses(String adminAddresses) {
-        this.adminAddresses = adminAddresses;
-    }
-    public void setAppName(String appName) {
-        this.appName = appName;
-    }
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-    public void setPort(int port) {
-        this.port = port;
-    }
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
-    }
-    public void setLogPath(String logPath) {
-        this.logPath = logPath;
-    }
-    public void setLogRetentionDays(int logRetentionDays) {
-        this.logRetentionDays = logRetentionDays;
-    }
-
-    // ---------------------- applicationContext ----------------------
+    @Getter
     private static ApplicationContext applicationContext;
+
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        this.applicationContext = applicationContext;
-    }
-    public static ApplicationContext getApplicationContext() {
-        return applicationContext;
+    public void setApplicationContext(ApplicationContext context) throws BeansException {
+        applicationContext = context;
     }
 
 
@@ -97,14 +76,15 @@ public class XxlJobExecutor implements ApplicationContextAware {
         TriggerCallbackThread.getInstance().start();
 
         // init executor-server
-        port = port>0?port: NetUtil.findAvailablePort(9999);
-        ip = (ip!=null&&ip.trim().length()>0)?ip: IpUtil.getIp();
+        port = port > 0 ? port : NetUtil.findAvailablePort(9999);
+        ip = (ip != null && ip.trim().length() > 0) ? ip : IpUtil.getIp();
         initRpcProvider(ip, port, appName, accessToken);
     }
-    public void destroy(){
+
+    public void destroy() {
         // destory jobThreadRepository
         if (jobThreadRepository.size() > 0) {
-            for (Map.Entry<Integer, JobThread> item: jobThreadRepository.entrySet()) {
+            for (Map.Entry<Integer, JobThread> item : jobThreadRepository.entrySet()) {
                 removeJobThread(item.getKey(), "web container destroy and kill the job.");
             }
             jobThreadRepository.clear();
@@ -123,10 +103,11 @@ public class XxlJobExecutor implements ApplicationContextAware {
 
     // ---------------------- admin-client (rpc invoker) ----------------------
     private static List<AdminBiz> adminBizList;
+
     private static void initAdminBizList(String adminAddresses, String accessToken) throws Exception {
-        if (adminAddresses!=null && adminAddresses.trim().length()>0) {
-            for (String address: adminAddresses.trim().split(",")) {
-                if (address!=null && address.trim().length()>0) {
+        if (adminAddresses != null && adminAddresses.trim().length() > 0) {
+            for (String address : adminAddresses.trim().split(",")) {
+                if (address != null && address.trim().length() > 0) {
 
                     String addressUrl = address.concat(AdminBiz.MAPPING);
                     if (addressUrl.startsWith("http://")) {
@@ -147,7 +128,8 @@ public class XxlJobExecutor implements ApplicationContextAware {
             }
         }
     }
-    public static List<AdminBiz> getAdminBizList(){
+
+    public static List<AdminBiz> getAdminBizList() {
         return adminBizList;
     }
 
@@ -155,6 +137,7 @@ public class XxlJobExecutor implements ApplicationContextAware {
     // ---------------------- executor-server (rpc provider) ----------------------
     private XxlRpcInvokerFactory xxlRpcInvokerFactory = null;
     private XxlRpcProviderFactory xxlRpcProviderFactory = null;
+
     private void initRpcProvider(String ip, int port, String appName, String accessToken) throws Exception {
         // init invoker factory
         xxlRpcInvokerFactory = new XxlRpcInvokerFactory();
@@ -167,7 +150,7 @@ public class XxlJobExecutor implements ApplicationContextAware {
         xxlRpcProviderFactory.addService(ExecutorBiz.class.getName(), null, new ExecutorBizImpl());
 
         // start
-       xxlRpcProviderFactory.start();
+        xxlRpcProviderFactory.start();
 
     }
 
@@ -197,27 +180,30 @@ public class XxlJobExecutor implements ApplicationContextAware {
         try {
             xxlRpcInvokerFactory.stop();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
         // stop provider factory
         try {
             xxlRpcProviderFactory.stop();
         } catch (Exception e) {
-            logger.error(e.getMessage(), e);
+            log.error(e.getMessage(), e);
         }
     }
 
 
     // ---------------------- job handler repository ----------------------
     private static ConcurrentHashMap<String, IJobHandler> jobHandlerRepository = new ConcurrentHashMap<String, IJobHandler>();
-    public static IJobHandler registJobHandler(String name, IJobHandler jobHandler){
-        logger.info(">>>>>>>>>>> xxl-job register jobhandler success, name:{}, jobHandler:{}", name, jobHandler);
+
+    public static IJobHandler registJobHandler(String name, IJobHandler jobHandler) {
+        log.info(">>>>>>>>>>> xxl-job register jobhandler success, name:{}, jobHandler:{}", name, jobHandler);
         return jobHandlerRepository.put(name, jobHandler);
     }
-    public static IJobHandler loadJobHandler(String name){
+
+    public static IJobHandler loadJobHandler(String name) {
         return jobHandlerRepository.get(name);
     }
-    private static void initJobHandlerRepository(ApplicationContext applicationContext){
+
+    private static void initJobHandlerRepository(ApplicationContext applicationContext) {
         if (applicationContext == null) {
             return;
         }
@@ -225,9 +211,9 @@ public class XxlJobExecutor implements ApplicationContextAware {
         // init job handler action
         Map<String, Object> serviceBeanMap = applicationContext.getBeansWithAnnotation(JobHandler.class);
 
-        if (serviceBeanMap!=null && serviceBeanMap.size()>0) {
+        if (serviceBeanMap != null && serviceBeanMap.size() > 0) {
             for (Object serviceBean : serviceBeanMap.values()) {
-                if (serviceBean instanceof IJobHandler){
+                if (serviceBean instanceof IJobHandler) {
                     String name = serviceBean.getClass().getAnnotation(JobHandler.class).value();
                     IJobHandler handler = (IJobHandler) serviceBean;
                     if (loadJobHandler(name) != null) {
@@ -239,15 +225,14 @@ public class XxlJobExecutor implements ApplicationContextAware {
         }
     }
 
+    private static ConcurrentHashMap<Integer, JobThread> jobThreadRepository = new ConcurrentHashMap<>();
 
-    // ---------------------- job thread repository ----------------------
-    private static ConcurrentHashMap<Integer, JobThread> jobThreadRepository = new ConcurrentHashMap<Integer, JobThread>();
-    public static JobThread registJobThread(int jobId, IJobHandler handler, String removeOldReason){
+    public static JobThread registJobThread(int jobId, IJobHandler handler, String removeOldReason) {
         JobThread newJobThread = new JobThread(jobId, handler);
         newJobThread.start();
-        logger.info(">>>>>>>>>>> xxl-job regist JobThread success, jobId:{}, handler:{}", new Object[]{jobId, handler});
+        log.info(">>>>>>>>>>> xxl-job regist JobThread success, jobId:{}, handler:{}", new Object[]{jobId, handler});
 
-        JobThread oldJobThread = jobThreadRepository.put(jobId, newJobThread);	// putIfAbsent | oh my god, map's put method return the old value!!!
+        JobThread oldJobThread = jobThreadRepository.put(jobId, newJobThread);    // putIfAbsent | oh my god, map's put method return the old value!!!
         if (oldJobThread != null) {
             oldJobThread.toStop(removeOldReason);
             oldJobThread.interrupt();
@@ -255,14 +240,16 @@ public class XxlJobExecutor implements ApplicationContextAware {
 
         return newJobThread;
     }
-    public static void removeJobThread(int jobId, String removeOldReason){
+
+    public static void removeJobThread(int jobId, String removeOldReason) {
         JobThread oldJobThread = jobThreadRepository.remove(jobId);
         if (oldJobThread != null) {
             oldJobThread.toStop(removeOldReason);
             oldJobThread.interrupt();
         }
     }
-    public static JobThread loadJobThread(int jobId){
+
+    public static JobThread loadJobThread(int jobId) {
         JobThread jobThread = jobThreadRepository.get(jobId);
         return jobThread;
     }
