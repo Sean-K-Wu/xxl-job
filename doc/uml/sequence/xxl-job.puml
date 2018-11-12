@@ -1,0 +1,34 @@
+@startuml
+'title XXL-JOB
+
+participant executor as "Executor" order 10
+participant admin as "Admin" order 20
+database mysql as "MySQL" order 30
+
+'== 注册/心跳 ==
+'executor -> admin : registry(RegistryParam registryParam)\n\n1. registryGroup : EXECUTOR\n2. registryKey : xxl-job-executor-sample\n3. registryValue : 192.168.1.2:9999
+'admin -> mysql : registryDao.registryUpdate\nregistryDao.registrySave
+'admin <-- mysql
+'executor <-- admin : ReturnT.SUCCESS
+'newpage
+'
+'== 移除注册 ==
+'executor -> admin : registryRemove(RegistryParam registryParam)\n\n1. registryGroup : EXECUTOR\n2. registryKey : xxl-job-executor-sample\n3. registryValue : 192.168.1.2:9999
+'admin -> mysql : registryDao.registryDelete
+'admin <-- mysql
+'executor <-- admin : ReturnT.SUCCESS
+'newpage
+
+== 回调 ==
+executor -> admin : callback(List<CallbackParam> callbackParamList)\n1. logId : 23438\n2. logDateTime : 1542029450024\n3. executeResult : ReturnT(code=200, msg=null, content=null)
+admin -> mysql : jobLogDao.load(logId)
+admin <-- mysql : jobLog
+alt code == 200
+    admin -> mysql : jobInfoDao.loadById(jobLog.getJobId())
+    admin <-- mysql : jobInfo
+    admin -> admin : 1. String[] childJobIds = jobInfo.getChildJobId().split(",");\n2. trigger(childJobId, failRetryCount=0)\n3. 触发任务的过程见其它分析
+end
+admin -> mysql : jobLogDao.updateHandleInfo(jobLog)\n1. handleTime : now\n2. handleCode : code\n3. handleMsg
+admin <-- mysql
+executor <-- admin : ReturnT.SUCCESS
+@enduml
