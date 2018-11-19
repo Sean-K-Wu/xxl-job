@@ -10,14 +10,14 @@ import com.xxl.job.core.biz.model.TriggerParam;
 public interface ExecutorBiz {
 
     /**
-     * 心跳
+     * 心跳检测
      *
      * @return
      */
     ReturnT<String> beat();
 
     /**
-     * 闲时心跳
+     * 空闲心跳检测
      *
      * @param jobId
      * @return
@@ -25,7 +25,7 @@ public interface ExecutorBiz {
     ReturnT<String> idleBeat(int jobId);
 
     /**
-     * 停止任务
+     * 终止任务
      *
      * @param jobId
      * @return
@@ -33,7 +33,7 @@ public interface ExecutorBiz {
     ReturnT<String> kill(int jobId);
 
     /**
-     * 记录日志
+     * 获取日志
      *
      * @param logDateTime
      * @param logId
@@ -43,7 +43,7 @@ public interface ExecutorBiz {
     ReturnT<LogResult> log(long logDateTime, int logId, int fromLineNum);
 
     /**
-     * 运行
+     * 执行任务
      *
      * @param triggerParam
      * @return

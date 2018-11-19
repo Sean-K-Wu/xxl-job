@@ -2,7 +2,6 @@ package com.xxl.job.admin.core.model;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,14 +14,22 @@ public class XxlJobGroup {
     private String appName;
     private String title;
     private int order;
-    private int addressType;    // 执行器地址类型：0=自动注册、1=手动录入
-    private String addressList;    // 执行器地址列表，多地址逗号分隔(手动录入)
+    /**
+     * 执行器地址类型：0=自动注册、1=手动录入
+     */
+    private int addressType;
+    /**
+     * 执行器地址列表，多地址逗号分隔(手动录入)
+     */
+    private String addressList;
+    /**
+     * 执行器地址列表(系统注册)
+     */
+    private List<String> registryList;
 
-    // registry list
-    private List<String> registryList;  // 执行器地址列表(系统注册)
     public List<String> getRegistryList() {
         if (StringUtils.isNotBlank(addressList)) {
-            registryList = new ArrayList<String>(Arrays.asList(addressList.split(",")));
+            registryList = Arrays.asList(addressList.split(","));
         }
         return registryList;
     }

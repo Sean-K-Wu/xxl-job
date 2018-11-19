@@ -1,0 +1,29 @@
+@startuml
+title 路由策略 - CONSISTENT HASH
+
+participant a as "Admin" order 10
+participant e1 as "Executor 1\n172.17.34.35:4200" order 20
+participant e2 as "Executor 2\n172.17.34.36:4100" order 30
+participant e3 as "Executor 3\n172.17.34.35:4100" order 40
+
+== 注册监控 ==
+note over a
+    注册表信息
+    Executor 3 -> 172.17.34.35:4100
+    Executor 1 -> 172.17.34.35:4200
+    Executor 2 -> 172.17.34.36:4100
+end note
+
+== 路由策略 ==
+a -> a : \
+1. 执行器Hash -- 哈希环\n\
+2. 任务Hash\n\
+3. 选择执行器
+
+a -> e2 : 调用
+a <-- e2 : 成功
+
+note over a #red
+    鸡肋的一致性Hash！！
+end note
+@enduml

@@ -1,0 +1,24 @@
+@startuml
+title 路由策略 - FIRST+LAST
+
+participant a as "Admin" order 10
+participant e1 as "Executor 1\n172.17.34.35:4200" order 20
+participant e2 as "Executor 2\n172.17.34.36:4100" order 30
+participant e3 as "Executor 3\n172.17.34.35:4100" order 40
+
+== 注册监控 ==
+note over a
+    注册表信息
+    Executor 3 -> 172.17.34.35:4100
+    Executor 1 -> 172.17.34.35:4200
+    Executor 2 -> 172.17.34.36:4100
+end note
+
+== 路由策略 - FIRST ==
+a -> e3 : 调用
+a <-- e3 : 成功
+
+== 路由策略 - LAST ==
+a -> e2 : 调用
+a <-- e2 : 成功
+@enduml

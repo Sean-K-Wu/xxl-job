@@ -227,12 +227,13 @@ public class XxlJobExecutor implements ApplicationContextAware {
 
     private static ConcurrentHashMap<Integer, JobThread> jobThreadRepository = new ConcurrentHashMap<>();
 
-    public static JobThread registJobThread(int jobId, IJobHandler handler, String removeOldReason) {
+    public static JobThread registerJobThread(int jobId, IJobHandler handler, String removeOldReason) {
         JobThread newJobThread = new JobThread(jobId, handler);
         newJobThread.start();
         log.info(">>>>>>>>>>> xxl-job regist JobThread success, jobId:{}, handler:{}", new Object[]{jobId, handler});
 
-        JobThread oldJobThread = jobThreadRepository.put(jobId, newJobThread);    // putIfAbsent | oh my god, map's put method return the old value!!!
+        // putIfAbsent | oh my god, map's put method return the old value!!!
+        JobThread oldJobThread = jobThreadRepository.put(jobId, newJobThread);
         if (oldJobThread != null) {
             oldJobThread.toStop(removeOldReason);
             oldJobThread.interrupt();

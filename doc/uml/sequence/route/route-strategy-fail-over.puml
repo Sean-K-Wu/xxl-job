@@ -1,0 +1,23 @@
+@startuml
+title 路由策略 - FAIL OVER
+
+participant a as "Admin" order 10
+participant e1 as "Executor 1\n172.17.34.35:4200" order 20
+participant e2 as "Executor 2\n172.17.34.36:4100" order 30
+participant e3 as "Executor 3\n172.17.34.35:4100" order 40
+
+== 注册监控 ==
+note over a
+    注册表信息
+    Executor 3 -> 172.17.34.35:4100
+    Executor 1 -> 172.17.34.35:4200
+    Executor 2 -> 172.17.34.36:4100
+end note
+
+== 路由策略 ==
+a -> e1 : 健康检查
+a -> a : 超时异常
+a -> e2 : 健康检查
+a <-- e2 : 成功
+a ->X e3: 不会发起健康检查
+@enduml

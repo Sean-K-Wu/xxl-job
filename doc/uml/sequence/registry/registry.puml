@@ -1,0 +1,26 @@
+@startuml
+title 注册/心跳
+
+participant e as "Executor" order 10
+participant a1 as "Admin 1" order 20
+participant a2 as "Admin 2" order 30
+participant a3 as "Admin 3" order 40
+database m as "MySQL" order 50
+
+note left of e
+    频率：30s
+    注册包：addr
+end note
+== Admin 1 ==
+e -> a1 : 注册
+e <-- a1 : 失败
+
+== Admin 2 ==
+e -> a2 : 注册
+a2 -> m : 更新注册表
+a2 <-- m : 成功
+e <-- a2 : 成功
+
+== Admin 3 ==
+e ->x a3 : 不会发起调用
+@enduml

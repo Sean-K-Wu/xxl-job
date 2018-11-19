@@ -1,0 +1,31 @@
+@startuml
+title 路由策略
+
+participant a as "Admin" order 10
+participant e1 as "Executor 1" order 20
+participant e2 as "Executor 2" order 30
+participant e3 as "Executor 3" order 40
+
+== 注册 ==
+e1 -> a : 注册
+e1 <-- a: 成功
+e2 -> a : 注册
+e2 <-- a : 成功
+e3 -> a : 注册
+e3 <-- a : 成功
+
+== 注册监控 ==
+a -> a : \
+1. 获取自动注册的JobGroup\n\
+2. 移除过期的注册信息\n\
+3. 刷新注册信息，__**字典序**__
+
+== 路由调度 ==
+note over a
+    维护注册表
+    依据CRON表达式调用
+end note
+a -> a : 路由策略
+a -> e2 : 实际调用
+a <-- e2 : 成功
+@enduml
