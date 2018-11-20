@@ -1,0 +1,24 @@
+@startuml
+title 实际调度
+
+participant a as "Admin" order 10
+participant e as "Executor" order 20
+
+a -> e : 触发
+
+note right e
+    依据触发类型，实例化对象
+    1. Bean
+    2. Groovy
+    3. Script
+end note
+
+note over e
+    阻塞策略
+    1. 单机串行
+    2. 丢弃后续调度
+    3. 覆盖之前调度
+end note
+
+a <-- e : 成功/失败
+@enduml

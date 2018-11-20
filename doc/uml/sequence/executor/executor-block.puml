@@ -1,0 +1,21 @@
+@startuml
+title 阻塞策略
+
+start
+if (丢弃后续调度) then (Y)
+  if (isRunningOrHasQueue) then (Y)
+    :调度失败;
+    stop
+  endif
+elseif (覆盖之前调度) then (Y)
+  if (isRunningOrHasQueue) then (Y)
+    :1. 中断处理线程\n2. 新建处理线程;
+  endif
+endif
+
+:加入待处理队列;
+note left
+    LinkedBlockingQueue
+end note
+end
+@enduml

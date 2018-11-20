@@ -1,0 +1,36 @@
+@startuml
+title 重试策略
+
+start
+partition 定时触发 {
+    :定时触发任务;
+    note left
+        生成任务日志ID
+    end note
+    :记录重试次数\n进入监控队列;
+    note left
+        LinkedBlockingQueue<Integer>
+    end note
+}
+
+partition 监控线程 {
+    while (线程是否停止？)
+        :转移所有任务日志;
+        note left
+            int drainTo(Collection c)
+        end note
+        partition 遍历任务日志 {
+            if (任务正在运行中) then (Y)
+              :再次进入监控队列;
+            elseif (任务执行成功) then (Y)
+              :无动作;
+            else (任务执行失败)
+              :重试次数-1\n再次进入监控队列;
+            endif
+        }
+        :休眠10s;
+    endwhile;
+}
+
+end
+@enduml

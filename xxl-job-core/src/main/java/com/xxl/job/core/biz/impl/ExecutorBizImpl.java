@@ -31,7 +31,6 @@ public class ExecutorBizImpl implements ExecutorBiz {
 
     @Override
     public ReturnT<String> idleBeat(int jobId) {
-
         // isRunningOrHasQueue
         boolean isRunningOrHasQueue = false;
         JobThread jobThread = XxlJobExecutor.loadJobThread(jobId);
@@ -63,7 +62,7 @@ public class ExecutorBizImpl implements ExecutorBiz {
         String logFileName = XxlJobFileAppender.makeLogFileName(new Date(logDateTime), logId);
 
         LogResult logResult = XxlJobFileAppender.readLog(logFileName, fromLineNum);
-        return new ReturnT<LogResult>(logResult);
+        return new ReturnT<>(logResult);
     }
 
     @Override
@@ -138,7 +137,7 @@ public class ExecutorBizImpl implements ExecutorBiz {
                 jobHandler = new ScriptJobHandler(triggerParam.getJobId(), triggerParam.getGlueUpdateTime(), triggerParam.getGlueSource(), GlueTypeEnum.match(triggerParam.getGlueType()));
             }
         } else {
-            return new ReturnT<String>(ReturnT.FAIL_CODE, "glueType[" + triggerParam.getGlueType() + "] is not valid.");
+            return new ReturnT<>(ReturnT.FAIL_CODE, "glueType[" + triggerParam.getGlueType() + "] is not valid.");
         }
 
         // executor block strategy
@@ -147,17 +146,14 @@ public class ExecutorBizImpl implements ExecutorBiz {
             if (ExecutorBlockStrategyEnum.DISCARD_LATER == blockStrategy) {
                 // discard when running
                 if (jobThread.isRunningOrHasQueue()) {
-                    return new ReturnT<String>(ReturnT.FAIL_CODE, "block strategy effect：" + ExecutorBlockStrategyEnum.DISCARD_LATER.getTitle());
+                    return new ReturnT<>(ReturnT.FAIL_CODE, "block strategy effect：" + ExecutorBlockStrategyEnum.DISCARD_LATER.getTitle());
                 }
             } else if (ExecutorBlockStrategyEnum.COVER_EARLY == blockStrategy) {
                 // kill running jobThread
                 if (jobThread.isRunningOrHasQueue()) {
                     removeOldReason = "block strategy effect：" + ExecutorBlockStrategyEnum.COVER_EARLY.getTitle();
-
                     jobThread = null;
                 }
-            } else {
-                // just queue trigger
             }
         }
 
@@ -167,8 +163,6 @@ public class ExecutorBizImpl implements ExecutorBiz {
         }
 
         // push data to queue
-        ReturnT<String> pushResult = jobThread.pushTriggerQueue(triggerParam);
-        return pushResult;
+        return jobThread.pushTriggerQueue(triggerParam);
     }
-
 }

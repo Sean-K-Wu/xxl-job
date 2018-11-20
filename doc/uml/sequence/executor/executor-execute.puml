@@ -1,0 +1,30 @@
+@startuml
+title 执行策略
+
+start
+:获取待处理任务;
+note left
+poll(3,SECONDS)
+end note
+
+if (BEAN || GROOVY) then (Y)
+    :execute(param);
+elseif (SCRIPT) then (Y)
+    :1. 创建脚本文件\n2. 执行脚本;
+endif
+
+if (是否超时) then (Y)
+    :调度失败（超时）;
+    note left
+        FutureTask
+    end note
+    stop
+endif
+
+:添加到回调队列;
+note left
+    LinkedBlockingQueue
+end note
+
+end
+@enduml

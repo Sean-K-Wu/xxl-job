@@ -1,0 +1,38 @@
+@startuml
+title 实例化
+
+start
+if (BEAN) then (Y)
+  partition 容器初始化 {
+      :注册@JobHandler组件;
+      note left
+          1. getBeansWithAnnotation(JobHandler.class)
+          2. registJobHandler(name, handler)
+      end note
+      floating note left: For Spring!!
+  }
+
+  partition 定时调度 {
+      :获取JobHandler;
+      note left
+          loadJobHandler(name)
+      end note
+  }
+elseif (GROOVY) then (Y)
+  :类加载;
+  note left
+      GroovyClassLoader
+      .parseClass(codeSource)
+  end note
+
+  :装配字段;
+  note left
+      For Spring!!
+  end note
+elseif (SCRIPT) then (Y)
+  :保存脚本代码;
+else
+  :调度失败;
+endif
+end
+@enduml

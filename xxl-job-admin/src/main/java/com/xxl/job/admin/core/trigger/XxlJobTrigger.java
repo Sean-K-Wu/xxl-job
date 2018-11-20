@@ -185,13 +185,13 @@ public class XxlJobTrigger {
      * @return
      */
     public static ReturnT<String> runExecutor(TriggerParam triggerParam, String address) {
-        ReturnT<String> runResult = null;
+        ReturnT<String> runResult;
         try {
             ExecutorBiz executorBiz = XxlJobDynamicScheduler.getExecutorBiz(address);
             runResult = executorBiz.run(triggerParam);
         } catch (Exception e) {
             logger.error(">>>>>>>>>>> xxl-job trigger error, please check if the executor[{}] is running.", address, e);
-            runResult = new ReturnT<String>(ReturnT.FAIL_CODE, "" + e);
+            runResult = new ReturnT<>(ReturnT.FAIL_CODE, "" + e);
         }
 
         StringBuffer runResultSB = new StringBuffer(I18nUtil.getString("jobconf_trigger_run") + "：");
