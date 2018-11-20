@@ -13,7 +13,7 @@ note left of e
 end note
 == Admin 1 ==
 e -> a1 : 注册
-e <-- a1 : 失败
+e -> e : 等待超时，失败
 
 == Admin 2 ==
 e -> a2 : 注册

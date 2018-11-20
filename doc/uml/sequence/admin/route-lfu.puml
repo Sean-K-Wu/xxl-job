@@ -8,7 +8,7 @@ participant e3 as "Executor 3\n172.17.34.35:4100" order 40
 
 == 注册监控 ==
 note over a
-    注册表信息
+    注册表信息（字典序）
     Executor 3 -> 172.17.34.35:4100
     Executor 1 -> 172.17.34.35:4200
     Executor 2 -> 172.17.34.36:4100
@@ -36,6 +36,8 @@ Executor 1 -> 2\n\
 Executor 2 -> 1
 a -> e3 : 调用
 a <-- e3 : 成功
+
+newpage
 
 == 重置计数，非严格LFU ==
 note over a

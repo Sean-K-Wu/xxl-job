@@ -1,5 +1,5 @@
 @startuml
-title 路由策略
+title 路由调度
 
 participant a as "Admin" order 10
 participant e1 as "Executor 1" order 20
@@ -7,12 +7,9 @@ participant e2 as "Executor 2" order 30
 participant e3 as "Executor 3" order 40
 
 == 注册 ==
-e1 -> a : 注册
-e1 <-- a: 成功
-e2 -> a : 注册
-e2 <-- a : 成功
-e3 -> a : 注册
-e3 <-- a : 成功
+e1 <-> a : 注册
+e2 <-> a : 注册
+e3 <-> a : 注册
 
 == 注册监控 ==
 a -> a : \
@@ -23,7 +20,7 @@ a -> a : \
 == 路由调度 ==
 note over a
     维护注册表
-    依据CRON表达式调用
+    依据CRON表达式定时调用
 end note
 a -> a : 路由策略
 a -> e2 : 实际调用

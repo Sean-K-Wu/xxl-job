@@ -55,7 +55,7 @@ public class ExecutorRouteConsistentHash extends ExecutorRouter {
         return hashCode & 0xFFFFFFFFL;
     }
 
-    public String hashJob(int jobId, List<String> addressList) {
+    private String hashJob(int jobId, List<String> addressList) {
         // ------A1------A2-------A3------
         // -----------J1------------------
         TreeMap<Long, String> addressRing = new TreeMap<>();
