@@ -21,4 +21,8 @@ a -> e1 : 调用 index = 1, total = 3
 a <-- e1 : 成功
 a -> e2 : 调用 index = 2, total = 3
 a <-- e2 : 成功
+
+note over a #red
+    比较粗糙
+end note
 @enduml

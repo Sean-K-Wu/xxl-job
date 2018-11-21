@@ -14,21 +14,21 @@ note over a
     Executor 2 -> 172.17.34.36:4100
 end note
 
-== 第1次调用 ==
+== 第1次调度 ==
 a -> a : \
 1. count = random(100) = 97\n\
 2. index = count % size = 1
 a -> e1 : 调用
 a <-- e1 : 成功
 
-== 第2次调用 ==
+== 第2次调度 ==
 a -> a : \
 1. ++count = 98\n\
 2. index = count % size = 2
 a -> e2 : 调用
 a <-- e2 : 成功
 
-== 第3次调用 ==
+== 第3次调度 ==
 a -> a : \
 1. ++count = 99\n\
 2. index = count % size = 0

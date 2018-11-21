@@ -14,7 +14,7 @@ note over a
     Executor 2 -> 172.17.34.36:4100
 end note
 
-== 第1次调用 ==
+== 第1次调度 ==
 a -> a : \
 初始化计数\n\
 Executor 3 -> random.nextInt(size) = 1\n\
@@ -28,7 +28,7 @@ Executor 2 -> 1
 a -> e2 : 调用
 a <-- e2 : 成功
 
-== 第2次调用 ==
+== 第2次调度 ==
 a -> a : \
 选择Executor 3 __**+1**__\n\
 Executor 3 -> 2\n\
