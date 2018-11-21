@@ -1,0 +1,15 @@
+@startuml
+title 核心过程
+
+participant e as "Executor" order 10
+participant a as "Admin" order 20
+
+e -> a : 注册/心跳
+a -> a : 路由策略
+e <- a : 调度
+e -> e : 实例化
+e -> e : 阻塞策略
+e -> e : 执行任务
+e -> a : 回调
+a -> a : 调度失败\n重试
+@enduml

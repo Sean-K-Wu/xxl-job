@@ -24,6 +24,6 @@ a -> e2 : 调用
 a <-- e2 : 成功
 
 note over a #red
-    鸡肋的一致性Hash！！
+    应用场景不太匹配
 end note
 @enduml

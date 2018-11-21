@@ -20,6 +20,6 @@ note over a
     双向链表
 end note
 note over a #red
-    缺少失效检测移除策略！！
+    缺少失效移除策略
 end note
 @enduml

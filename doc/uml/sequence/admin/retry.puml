@@ -20,12 +20,12 @@ partition 监控线程 {
             int drainTo(Collection c)
         end note
         partition 遍历任务日志 {
-            if (任务正在运行中) then (Y)
+            if (执行中) then (Y)
               :再次进入监控队列;
-            elseif (任务执行成功) then (Y)
+            elseif (执行成功) then (Y)
               :无动作;
-            else (任务执行失败)
-              :重试次数-1\n再次进入监控队列;
+            else (N)
+              :重试次数__**-1**__\n再次进入监控队列;
             endif
         }
         :休眠10s;

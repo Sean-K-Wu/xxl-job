@@ -11,6 +11,9 @@ if (BEAN || GROOVY) then (Y)
     :execute(param);
 elseif (SCRIPT) then (Y)
     :1. 创建脚本文件\n2. 执行脚本;
+else (N)
+    :执行失败;
+    stop
 endif
 
 if (是否超时) then (Y)
@@ -18,7 +21,10 @@ if (是否超时) then (Y)
     note left
         FutureTask
     end note
-    stop
+elseif (是否异常) then (Y)
+    :调度失败;
+else (N)
+    :调度成功;
 endif
 
 :添加到回调队列;

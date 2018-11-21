@@ -11,6 +11,7 @@ elseif (覆盖之前调度) then (Y)
   if (isRunningOrHasQueue) then (Y)
     :1. 中断处理线程\n2. 新建处理线程;
   endif
+else (N)
 endif
 
 :加入待处理队列;

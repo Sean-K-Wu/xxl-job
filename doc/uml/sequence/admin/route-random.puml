@@ -14,10 +14,9 @@ note over a
     Executor 2 -> 172.17.34.36:4100
 end note
 
-== 随机选择 ==
-a -> a : \
-1. random.nextInt(size) = 2
+== 路由策略 ==
+a -> a : random.nextInt(size) = 2
 
-a -> e3 : 调用
-a <-- e3 : 成功
+a -> e2 : 调用
+a <-- e2 : 成功
 @enduml
